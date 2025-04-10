@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: hoagie-mongodb
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data:/data/db
+    environment:
+      - MONGO_INITDB_DATABASE=hoagie-app
+    networks:
+      - hoagie-network
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: hoagie-backend
+    restart: always
+    ports:
+      - 3000:3000
+    environment:
+      - NODE_ENV=production
+      - MONGODB_URI=mongodb://mongodb:27017/hoagie-app
+    depends_on:
+      - mongodb
+    networks:
+      - hoagie-network
+
+  # For the frontend, we're using Expo, which is primarily for development
+  # In a real production scenario, you would build and deploy the mobile app
+  # to app stores or use a service like Expo's EAS
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: hoagie-frontend
+    restart: always
+    ports:
+      - 19000:19000  # Expo app
+      - 19001:19001  # Metro bundler
+      - 19002:19002  # Expo DevTools
+      - 8081:8081    # Metro bundler dev server
+    environment:
+      - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
+      - REACT_NATIVE_PACKAGER_HOSTNAME=192.168.100.206
+      - EXPO_DEBUG=true
+      - EXPO_MANIFEST_HOST=192.168.100.206
+      - EXPO_PACKAGER_PROXY_URL=http://192.168.100.206
+    # Add this volume to watch for changes in your code during development
+    volumes:
+      - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
+    # Use host network for better connectivity on Linux
+    # network_mode: "host"  # Uncomment this on Linux systems
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - backend
+    networks:
+      - hoagie-network
+
+networks:
+  hoagie-network:
+    driver: bridge
+
+volumes:
+  mongodb_data: 

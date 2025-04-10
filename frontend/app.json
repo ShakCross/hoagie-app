@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Hoagie App",
+    "slug": "hoagie-app",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FF0000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.hoagieapp.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#FFD700"
+      },
+      "package": "com.hoagieapp.app"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "hoagie-app"
+      }
+    },
+    "packagerOpts": {
+      "hostType": "lan",
+      "lanType": "ip",
+      "dev": true,
+      "minify": false
+    },
+    "experiments": {
+      "tsconfigPaths": true
+    },
+    "owner": "hoagie-app"
+  }
+}
