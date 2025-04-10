@@ -45,10 +45,10 @@ services:
       - 8081:8081    # Metro bundler dev server
     environment:
       - EXPO_DEVTOOLS_LISTEN_ADDRESS=0.0.0.0
-      - REACT_NATIVE_PACKAGER_HOSTNAME=192.168.100.206
+      - REACT_NATIVE_PACKAGER_HOSTNAME=192.168.x.x
       - EXPO_DEBUG=true
-      - EXPO_MANIFEST_HOST=192.168.100.206
-      - EXPO_PACKAGER_PROXY_URL=http://192.168.100.206
+      - EXPO_MANIFEST_HOST=192.168.x.x
+      - EXPO_PACKAGER_PROXY_URL=http://192.168.x.x
     # Add this volume to watch for changes in your code during development
     volumes:
       - ./frontend:/usr/src/app

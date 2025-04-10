@@ -31,213 +31,128 @@ A full-stack mobile application for creating and sharing hoagie recipes, built w
 
 - Node.js 18.x or higher
 - npm 8.x or higher
-- Docker and Docker Compose (optional, for containerized setup)
-- Expo CLI (`npm install -g expo-cli`)
+- Docker and Docker Compose
 - Expo Go app on your mobile device (for testing on physical devices)
+- Expo account (create one at [expo.dev](https://expo.dev) if you don't have one)
 
-## Environment Setup
+## Project Setup - Step by Step
 
-Both the frontend and backend require environment variables to be configured properly:
+Follow these steps carefully to set up the Hoagie App for development:
 
-### Frontend Environment Setup
+### 1. Clone the Repository
 
-The frontend needs to know where to find the backend API:
+```bash
+git clone https://github.com/ShakCross/hoagie-app.git
+cd hoagie-app
+```
 
-1. Navigate to the frontend directory:
+### 2. Set Up Backend Environment
+
+```bash
+# Navigate to the backend directory
+cd backend
+
+# Create environment file
+cp .env.example .env
+
+# Go back to the project root
+cd ..
+```
+
+### 3. Set Up Frontend Environment
+
+```bash
+# Navigate to the frontend directory
+cd frontend
+
+# Create environment file
+cp .env.example .env
+```
+
+Edit the `.env` file and update the `EXPO_PUBLIC_API_URL` with your local IP address:
+```
+EXPO_PUBLIC_API_URL=http://192.168.x.x:3000/api
+```
+
+> **IMPORTANT**: Replace `192.168.x.x` with your actual local IP address. You can find this by running `ipconfig` on Windows or `ifconfig` on macOS/Linux. This is required for testing on physical devices using Expo Go.
+
+### 4. Update Docker Compose Configuration
+
+Open `docker-compose.yml` and update the following environment variables under the `frontend` service with your local IP address:
+
+```yaml
+environment:
+  - REACT_NATIVE_PACKAGER_HOSTNAME=192.168.x.x
+  - EXPO_MANIFEST_HOST=192.168.x.x
+  - EXPO_PACKAGER_PROXY_URL=http://192.168.x.x
+```
+
+Replace `192.168.x.x` with the same IP address you used in the frontend `.env` file.
+
+### 5. Start the Backend Services
+
+From the project root:
+
+```bash
+# Start MongoDB and the NestJS backend using Docker
+docker-compose up -d mongodb backend
+
+# Wait a few moments for the services to initialize
+```
+
+### 6. Start the Frontend
+
+```bash
+# Make sure you're in the frontend directory
+cd frontend
+
+# Install dependencies (first time only)
+npm install
+
+# Start the Expo development server
+npx expo start
+```
+
+> **NOTE**: When running `npx expo start` for the first time, you will be prompted to log in with your Expo account credentials. If you don't have an Expo account yet, you'll need to create one at [expo.dev](https://expo.dev) before proceeding. This is a one-time step required by Expo.
+
+### 7. Access the App
+
+Once the Expo dev server starts, you'll see a QR code in your terminal:
+- Scan it with your phone's camera (iOS) or Expo Go app (Android) to run on a mobile device
+- Press 'w' to run in web browser
+- Press 'a' to run on Android emulator
+- Press 'i' to run on iOS simulator (macOS only)
+
+### 8. Shutting Down
+
+When you're done developing, stop the backend services:
+
+```bash
+# From the project root
+docker-compose down
+```
+
+## Troubleshooting
+
+### Common Issues
+
+1. **Connection to Backend Fails**: Ensure your IP address is correctly set in both the frontend `.env` file and the `docker-compose.yml` file. This is especially important when testing on physical devices.
+
+2. **MongoDB Connection Issues**: Check if MongoDB is running and accessible:
    ```bash
-   cd frontend
+   docker-compose logs mongodb
    ```
 
-2. Create a `.env` file by copying the example:
+3. **Backend Startup Fails**: Verify environment variables and MongoDB connection:
    ```bash
-   npm run prepare-env
-   ```
-   Or manually:
-   ```bash
-   cp .env.example .env
+   docker-compose logs backend
    ```
 
-3. Edit the `.env` file and update the `EXPO_PUBLIC_API_URL` with your local IP address:
-   ```
-   # For development on physical devices (Expo Go)
-   EXPO_PUBLIC_API_URL=http://192.168.x.x:3000/api
-   
-   # For web development
-   # EXPO_PUBLIC_API_URL=http://localhost:3000/api
-   ```
+4. **Expo CLI Errors**: If you see Expo-related errors, make sure you're using `npx expo start` without additional flags.
 
-   > **IMPORTANT**: Replace `192.168.x.x` with your actual local IP address. You can find this by running `ipconfig` on Windows or `ifconfig` on macOS/Linux.
+5. **Expo Authentication Issues**: If you're having trouble logging in to Expo, you can run `npx expo login` separately to authenticate or reset your password through the [Expo website](https://expo.dev).
 
-### Backend Environment Setup
-
-The backend needs configuration for MongoDB and test user credentials:
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Create a `.env` file by copying the example:
-   ```bash
-   npm run prepare-env
-   ```
-   Or manually:
-   ```bash
-   cp .env.example .env
-   ```
-
-3. Edit the `.env` file as needed:
-   ```
-   # Node Environment Configuration
-   NODE_ENV=development
-   
-   # Server Port Configuration
-   PORT=3000
-   
-   # MongoDB Connection String
-   # For local MongoDB: mongodb://localhost:27017/hoagie-app
-   # For Docker: mongodb://mongodb:27017/hoagie-app
-   MONGODB_URI=mongodb://localhost:27017/hoagie-app
-   
-   # Test User Configuration
-   TEST_USER_EMAIL=test@example.com
-   TEST_USER_PASSWORD=test123
-   TEST_USER_NAME=Test User
-   ```
-
-## Installation and Setup
-
-### Option 1: Using Docker (Recommended for Development)
-
-1. Clone the repository:
-   ```bash
-   git clone https://github.com/yourusername/hoagie-app.git
-   cd hoagie-app
-   ```
-
-2. Set up environment variables as described in the Environment Setup section.
-
-3. Update your local IP in Docker Compose configuration:
-   Edit `docker-compose.yml` and update `REACT_NATIVE_PACKAGER_HOSTNAME`, `EXPO_MANIFEST_HOST`, and `EXPO_PACKAGER_PROXY_URL` with your local IP address.
-
-4. Start all services:
-   ```bash
-   docker-compose up
-   ```
-
-   Or use the provided script (which will only start MongoDB and backend, and run the frontend on your host machine):
-   ```bash
-   ./start-expo-dev.sh
-   ```
-
-### Option 2: Manual Setup
-
-#### Backend Setup
-
-1. Navigate to the backend directory:
-   ```bash
-   cd backend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up the environment variables as described earlier.
-
-4. Start the backend service:
-   ```bash
-   npm run start:dev
-   ```
-
-#### Frontend Setup
-
-1. Navigate to the frontend directory:
-   ```bash
-   cd frontend
-   ```
-
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-3. Set up the environment variables as described earlier.
-
-4. Start the Expo development server:
-   ```bash
-   npm start
-   ```
-
-## Running the App
-
-### On a Physical Mobile Device (Using Expo Go)
-
-1. Make sure your mobile device is on the same Wi-Fi network as your development machine.
-
-2. Ensure you've set the correct IP address in your frontend `.env` file:
-   ```
-   EXPO_PUBLIC_API_URL=http://192.168.x.x:3000/api
-   ```
-
-3. Start the backend:
-   ```bash
-   cd backend
-   npm run start:dev
-   ```
-
-4. Start the frontend:
-   ```bash
-   cd frontend
-   npm start
-   ```
-
-5. Scan the QR code displayed in the terminal with your phone:
-   - **iOS**: Use the Camera app
-   - **Android**: Use the Expo Go app
-
-6. The app should load on your device. If you see connection errors, double-check your IP address in the `.env` file.
-
-### In a Web Browser
-
-1. Set your frontend `.env` file to use localhost:
-   ```
-   EXPO_PUBLIC_API_URL=http://localhost:3000/api
-   ```
-
-2. Start the backend:
-   ```bash
-   cd backend
-   npm run start:dev
-   ```
-
-3. Start the frontend with web support:
-   ```bash
-   cd frontend
-   npm run web
-   ```
-
-4. The application should automatically open in your default browser at http://localhost:19006.
-
-### Using Expo Development Build (Advanced)
-
-For a more native-like development experience, you can create a development build:
-
-1. Install EAS CLI:
-   ```bash
-   npm install -g eas-cli
-   ```
-
-2. Build a development client:
-   ```bash
-   cd frontend
-   eas build --profile development --platform android
-   # or
-   eas build --profile development --platform ios
-   ```
-
-3. Follow the prompts and instructions from EAS.
+6. **QR Code Not Working**: If the QR code doesn't connect properly, ensure all IP addresses in your configuration files (`docker-compose.yml` and frontend `.env`) match your actual local IP address.
 
 ## Accessing the App
 
@@ -281,31 +196,7 @@ Before pushing your code to GitHub:
    - In `frontend/package.json`
    - In `backend/package.json`
 
-## Troubleshooting
-
-### Common Issues
-
-1. **Backend Connection Issues**
-   - Ensure MongoDB is running
-   - Check `.env` files for correct configuration
-   - Verify network settings if using Docker
-
-2. **Expo Connection Issues**
-   - Ensure the correct IP address is set in the Expo configuration
-   - Check if your device and development machine are on the same network
-   - If you see "Network response timed out" in Expo Go, check your IP address in `.env`
-
-3. **Docker Issues**
-   - Run `docker-compose down -v` to reset all containers and volumes
-   - Try rebuilding with `docker-compose build --no-cache`
-
-4. **UI Display Issues**
-   - If text appears cut off or buttons are hard to press, report the issue with a screenshot
-   - For older Android devices, try setting `enableExperimentalWebImplementation: false` in app.json
-
 ## Project Architecture
-
-![Architecture Diagram](docs/architecture.png)
 
 The application follows a three-tier architecture:
 1. **Frontend**: React Native mobile app with Expo
